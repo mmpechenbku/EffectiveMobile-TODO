@@ -6,15 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E4D122E02DAAEDC500AE54B1 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E4D122DF2DAAEDC500AE54B1 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E4D1221F2DAADF1B00AE54B1 /* EffectiveMobile-TODO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "EffectiveMobile-TODO.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		E4D122312DAADF1D00AE54B1 /* Exceptions for "EffectiveMobile-TODO" folder in "EffectiveMobile-TODO" target */ = {
+		E4D122DD2DAAEAF300AE54B1 /* Exceptions for "EffectiveMobile-TODO" folder in "EffectiveMobile-TODO" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Sources/Info.plist,
 			);
 			target = E4D1221E2DAADF1B00AE54B1 /* EffectiveMobile-TODO */;
 		};
@@ -24,7 +28,7 @@
 		E4D122212DAADF1B00AE54B1 /* EffectiveMobile-TODO */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				E4D122312DAADF1D00AE54B1 /* Exceptions for "EffectiveMobile-TODO" folder in "EffectiveMobile-TODO" target */,
+				E4D122DD2DAAEAF300AE54B1 /* Exceptions for "EffectiveMobile-TODO" folder in "EffectiveMobile-TODO" target */,
 			);
 			path = "EffectiveMobile-TODO";
 			sourceTree = "<group>";
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4D122E02DAAEDC500AE54B1 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = "EffectiveMobile-TODO";
 			packageProductDependencies = (
+				E4D122DF2DAAEDC500AE54B1 /* SnapKit */,
 			);
 			productName = "EffectiveMobile-TODO";
 			productReference = E4D1221F2DAADF1B00AE54B1 /* EffectiveMobile-TODO.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = E4D122162DAADF1B00AE54B1;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E4D122DE2DAAEDC500AE54B1 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E4D122202DAADF1B00AE54B1 /* Products */;
 			projectDirPath = "";
@@ -146,12 +155,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "EffectiveMobile-TODO/Info.plist";
+				INFOPLIST_FILE = "EffectiveMobile-TODO/Sources/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -173,12 +182,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "EffectiveMobile-TODO/Info.plist";
+				INFOPLIST_FILE = "EffectiveMobile-TODO/Sources/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -251,6 +260,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -307,6 +317,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -333,6 +344,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E4D122DE2DAAEDC500AE54B1 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E4D122DF2DAAEDC500AE54B1 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E4D122DE2DAAEDC500AE54B1 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E4D122172DAADF1B00AE54B1 /* Project object */;
 }
