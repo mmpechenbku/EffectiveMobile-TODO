@@ -8,7 +8,15 @@
 import UIKit
 import SnapKit
 
+protocol TasksListTableViewCellDelegate: AnyObject {
+    func didTapTaskDone(withId id: String, state: Bool, completion: @escaping (Bool) -> Void)
+}
+
 final class TasksListTableViewCell: UITableViewCell {
+
+    // MARK: - Internal Properties
+
+    weak var cellDelegate: TasksListTableViewCellDelegate?
 
     // MARK: - Private properties
 
@@ -23,27 +31,30 @@ final class TasksListTableViewCell: UITableViewCell {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.textColor = UIColor.designPalette.white
         label.numberOfLines = 1
+        label.setContentHuggingPriority(.defaultHigh + 1, for: .vertical)
         return label
     }()
 
     private lazy var taskLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         label.textColor = UIColor.designPalette.white
         label.numberOfLines = 2
         label.lineBreakMode = .byTruncatingTail
         label.textAlignment = .left
+        label.setContentHuggingPriority(.defaultHigh - 1, for: .vertical)
         return label
     }()
 
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = UIColor.designPalette.white
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.textColor = UIColor.designPalette.white.withAlphaComponent(0.5)
         label.numberOfLines = 1
+        label.setContentHuggingPriority(.defaultHigh, for: .vertical)
         return label
     }()
 
@@ -59,7 +70,13 @@ final class TasksListTableViewCell: UITableViewCell {
 
     private lazy var separatorView = SeparatorView()
 
-    private var isDone: Bool = false
+    private var isDone: Bool = false {
+        didSet {
+            isDone ? completedTask() : uncompletedTask()
+        }
+    }
+
+    private var id: String = ""
 
     // MARK: - Init
 
@@ -76,17 +93,23 @@ final class TasksListTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        setToDefault()
+//        uncompletedTask()
+        id = ""
+        isDone = false
+        titleLabel.text = nil
+        taskLabel.text = nil
+        dateLabel.text = nil
     }
 
     // MARK: - Internal Methods
 
     func configure(with model: Task) {
+        id = model.id
         titleLabel.text = model.title
         taskLabel.text = model.description
-        dateLabel.text = model.dateString
+        dateLabel.text = model.date.taskDateString()
 
-        model.isDone ? taskIsDone() : setToDefault()
+        model.isDone ? completedTask() : uncompletedTask()
     }
 }
 
@@ -129,32 +152,38 @@ private extension TasksListTableViewCell {
         }
     }
 
-    func taskIsDone() {
-        isDone = true
+    func completedTask() {
+//        isDone = true
         checkmarkButton.setImage(.designPalette.checkmark, for: .normal)
         checkmarkButton.tintColor = .designPalette.yellow
 
         titleLabel.strikeThrough(color: titleLabel.textColor)
         titleLabel.layer.opacity = 0.5
         taskLabel.textColor = taskLabel.textColor.withAlphaComponent(0.5)
-        dateLabel.textColor = dateLabel.textColor.withAlphaComponent(0.5)
+//        dateLabel.textColor = dateLabel.textColor.withAlphaComponent(0.5)
     }
 
-    func setToDefault() {
-        isDone = false
+    func uncompletedTask() {
+//        isDone = false
         checkmarkButton.setImage(.designPalette.circle, for: .normal)
         checkmarkButton.tintColor = .designPalette.strokeGray
 
         titleLabel.removeStrikeThrough()
         titleLabel.layer.opacity = 1
         taskLabel.textColor = .designPalette.white
-        dateLabel.textColor = .designPalette.white
+//        dateLabel.textColor = .designPalette.white
     }
 
     // MARK: - Actions
 
     @objc
     func checkMarkButtonDidTapped() {
-        isDone ? setToDefault() : taskIsDone()
+        if !id.isEmpty {
+            cellDelegate?.didTapTaskDone(withId: id, state: !isDone) { [weak self] isDone in
+                DispatchQueue.main.async {
+                    self?.isDone = isDone
+                }
+            }
+        }
     }
 }

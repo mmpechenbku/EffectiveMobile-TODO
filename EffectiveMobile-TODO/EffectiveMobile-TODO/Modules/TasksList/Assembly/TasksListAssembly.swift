@@ -9,10 +9,11 @@ final class TasksListAssembly {
     static func assembly() -> (controller: TasksListViewController, router: TasksListRouterProtocol) {
         let networkManager = NetworkManager.shared
         let databaseManager = CoreDataManager.shared
+        let userProfileManager = UserProfileManager()
 
         let router = TasksListRouter()
         let interactor = TasksListInteracotr(networkManager: networkManager, databaseManager: databaseManager)
-        let presenter = TasksListPresenter(router: router, interactor: interactor)
+        let presenter = TasksListPresenter(router: router, interactor: interactor, userProfileManager: userProfileManager)
 
         let tableView = TasksListTableView(output: presenter)
         let view = TasksListViewController(output: presenter, tableView: tableView)

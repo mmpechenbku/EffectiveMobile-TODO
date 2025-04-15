@@ -7,12 +7,17 @@
 
 // MARK: - Protocols
 
+import Foundation
+
 protocol TasksListViewInput: AnyObject {
     func setupFooter(with text: String)
+    func showDeleteTask(withMessage message: String, title: String, deleteAction: @escaping (() -> Void))
+    func showShareTask(title: String, description: String, dateString: String)
+    func showError(withText text: String)
 }
 
 protocol TasksListViewOutput: AnyObject {
-    func didLoadView()
+    func didAppear()
     func findTasks(with text: String)
     func addNewTask()
 }
@@ -22,9 +27,13 @@ protocol TasksListTableViewInput: AnyObject {
 }
 
 protocol TasksListTableViewOutput: AnyObject {
-    var findedModels: [Task]? { get set }
+    var findedModels: ModelState<[Task]>? { get set }
 
-    func taskDidTapped(withIndex index: Int)
+    func updateContentModel(completion: @escaping () -> Void)
+    func taskDidTapped(_ task: Task)
+    func taskDoneDidTapped(withId id: String, state: Bool, completion: @escaping (Bool) -> Void)
+    func deleteTaskDidTapped(with task: Task)
+    func shareTask(_ task: Task)
 }
 
 // MARK: - TasksListPresenter
@@ -33,7 +42,7 @@ final class TasksListPresenter {
 
     // MARK: - Internal Properties
 
-    var findedModels: [Task]? = nil {
+    var findedModels: ModelState<[Task]>? {
         didSet {
             tableView?.refreshData()
             configureFooter()
@@ -42,14 +51,20 @@ final class TasksListPresenter {
 
     weak var view: TasksListViewInput?
     weak var tableView: TasksListTableViewInput?
-    var router: TasksListRouterProtocol
-    var interactor: TasksListInteractorProtocol
+    let router: TasksListRouterProtocol
+    let interactor: TasksListInteractorProtocol
+    let userProfileManager: UserProfileManager
+    let isApiDataAlreadyLoaded: Bool
 
     // MARK: - Private Properties
 
     var contentModel: [Task]? = nil {
         didSet {
-            findedModels = contentModel
+            if let contentModel {
+                findedModels = .loaded(contentModel)
+            } else {
+                findedModels = .loading
+            }
             findTasks(with: searchText)
         }
     }
@@ -62,35 +77,49 @@ final class TasksListPresenter {
         view: TasksListViewInput? = nil,
         tableView: TasksListTableViewInput? = nil,
         router: TasksListRouterProtocol,
-        interactor: TasksListInteractorProtocol
+        interactor: TasksListInteractorProtocol,
+        userProfileManager: UserProfileManager
     ) {
         self.view = view
         self.tableView = tableView
         self.router = router
         self.interactor = interactor
+        self.userProfileManager = userProfileManager
+        self.isApiDataAlreadyLoaded = userProfileManager.isApiDataAlreadyLoaded()
     }
 }
 
 // MARK: - Private Methods
 
 private extension TasksListPresenter {
-    func setupContentModel() {
-        contentModel = interactor.obtainTasksFromDataBase()
+    func setupContentModel(completion: @escaping () -> Void) {
+        findedModels = .loading
+        if isApiDataAlreadyLoaded {
+            loadDataFromDatabase(completion: completion)
+        } else {
+            loadAndSaveDataFromAPI(completion: completion)
+        }
     }
 
     func configureFooter() {
-        guard let findedModels else {
-            view?.setupFooter(with: "0 Задач")
-            return
+
+        var footerText = ""
+
+        switch findedModels {
+        case .loading:
+            footerText = Strings.loading
+        case .loaded(let models):
+            let countText = getCountText(from: models.count)
+            footerText = "\(models.count) \(countText)"
+
+            if !searchText.isEmpty {
+                footerText = "Найдено \(footerText)"
+            }
+        case .failed, .none:
+            footerText = Strings.error
         }
 
-        let countText = getCountText(from: findedModels.count)
-
-        let footerText = "\(findedModels.count) \(countText)"
-
-        searchText.isEmpty
-            ? view?.setupFooter(with: footerText)
-            : view?.setupFooter(with: "Найдено \(footerText)")
+        view?.setupFooter(with: footerText)
     }
 
     func getCountText(from count: Int) -> String {
@@ -106,32 +135,109 @@ private extension TasksListPresenter {
             return "Задач"
         }
     }
+
+    func deleteTask(_ task: Task) {
+        interactor.deleteTask(task) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let isDeleted):
+                if isDeleted {
+                    setupContentModel() {}
+                } else {
+                    DispatchQueue.main.async { [weak self] in
+                        self?.view?.showError(withText: Strings.taskDoesntExistError)
+                    }
+                }
+            case .failure(let error):
+                DispatchQueue.main.async { [weak self] in
+                    self?.view?.showError(withText: error.localizedDescription)
+                }
+            }
+        }
+    }
+
+    func loadDataFromDatabase(completion: @escaping () -> Void) {
+        if isApiDataAlreadyLoaded {
+            interactor.obtainTasksFromDataBase { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case .success(let tasks):
+                    contentModel = tasks
+                case .failure(let error):
+                    findedModels = .failed
+                    DispatchQueue.main.async { [weak self] in
+                        self?.view?.showError(withText: error.localizedDescription)
+                    }
+                }
+                completion()
+            }
+        }
+    }
+
+    func loadAndSaveDataFromAPI(completion: @escaping () -> Void) {
+        interactor.obtainTasksFromNet { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let tasks):
+                contentModel = tasks
+                interactor.saveTasks(tasks) { [weak self] result in
+                    guard let self else { return }
+                    switch result {
+                    case .success(let isSaved):
+                        if isSaved {
+                            userProfileManager.setApiDataLoadingState(isLoaded: isSaved)
+                        }
+                    case .failure(let error):
+                        findedModels = .failed
+                        DispatchQueue.main.async { [weak self] in
+                            self?.view?.showError(withText: error.localizedDescription)
+                        }
+                    }
+                }
+            case .failure(let error):
+                findedModels = .failed
+                DispatchQueue.main.async { [weak self] in
+                    self?.view?.showError(withText: error.localizedDescription)
+                }
+            }
+            completion()
+        }
+    }
 }
 
 // MARK: - TasksListViewInput
 
 extension TasksListPresenter: TasksListViewOutput {
-    func didLoadView() {
-        setupContentModel()
+
+    func didAppear() {
+        setupContentModel() {}
     }
 
     func findTasks(with text: String) {
         searchText = text
 
         guard !text.isEmpty else {
-            findedModels = contentModel
+            if let contentModel {
+                findedModels = .loaded(contentModel)
+            } else {
+                findedModels = .loading
+            }
             return
         }
 
-        findedModels = []
+        findedModels = .loading
+
+        var satisfyingTasks: [Task] = []
 
         contentModel?.forEach { task in
             guard
                 task.title.lowercased().contains(text.lowercased()) || task.description.lowercased().contains(text.lowercased())
             else { return }
 
-            findedModels?.append(task)
+            satisfyingTasks.append(task)
         }
+
+        findedModels = .loaded(satisfyingTasks)
     }
 
     func addNewTask() {
@@ -142,9 +248,36 @@ extension TasksListPresenter: TasksListViewOutput {
 // MARK: - TasksListTableViewInput
 
 extension TasksListPresenter: TasksListTableViewOutput {
-    func taskDidTapped(withIndex index: Int) {
-        if let contentModel, contentModel.count > index {
-            router.toDetailTask?(contentModel[index])
+    func updateContentModel(completion: @escaping () -> Void) {
+        setupContentModel {
+            completion()
         }
+    }
+
+    func taskDidTapped(_ task: Task) {
+        router.toDetailTask?(task)
+    }
+
+    func taskDoneDidTapped(withId id: String, state: Bool, completion: @escaping (Bool) -> Void) {
+        interactor.updateTaskDoneState(withId: id, state: state) { result in
+            switch result {
+            case .success(let doneState):
+                completion(doneState)
+            case .failure(let error):
+                DispatchQueue.main.async { [weak self] in
+                    self?.view?.showError(withText: error.localizedDescription)
+                }
+            }
+        }
+    }
+
+    func deleteTaskDidTapped(with task: Task) {
+        view?.showDeleteTask(withMessage: "\(Strings.deleteQuestion) \"\(task.title)\"?", title: "") { [weak self] in
+            self?.deleteTask(task)
+        }
+    }
+
+    func shareTask(_ task: Task) {
+        view?.showShareTask(title: task.title, description: task.description, dateString: task.date.taskDateString())
     }
 }

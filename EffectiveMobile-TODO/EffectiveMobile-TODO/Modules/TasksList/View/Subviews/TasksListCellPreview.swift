@@ -36,7 +36,7 @@ final class TasksListCellPreview: UIViewController {
         let label = UILabel()
         label.text = "09/10/24"
         label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor.designPalette.white
+        label.textColor = UIColor.designPalette.white.withAlphaComponent(0.5)
         label.numberOfLines = 1
         return label
     }()
@@ -96,7 +96,7 @@ private extension TasksListCellPreview {
     func configure(with model: Task) {
         titleLabel.text = model.title
         taskLabel.text = model.description
-        dateLabel.text = model.dateString
+        dateLabel.text = model.date.taskDateString()
     }
 
     func getWidth() -> CGFloat {

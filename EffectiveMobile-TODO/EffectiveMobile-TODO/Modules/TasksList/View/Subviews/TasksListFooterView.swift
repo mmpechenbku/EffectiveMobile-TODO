@@ -25,7 +25,6 @@ final class TasksListFooterView: UIView {
         label.font = UIFont.systemFont(ofSize: 13)
         label.textColor = .designPalette.white
         label.numberOfLines = 1
-        label.text = "7 Задач"
         return label
     }()
 

@@ -32,6 +32,7 @@ final class TasksListTableView: UITableView {
 
 private extension TasksListTableView {
     func registerCells() {
+        register(TasksListShimmerTableViewCell.self)
         register(TasksListTableViewCell.self)
     }
 
@@ -42,7 +43,6 @@ private extension TasksListTableView {
 
     func setupUI() {
         backgroundColor = UIColor.designPalette.clear
-//        separatorStyle = .singleLine
         showsVerticalScrollIndicator = false
         contentInsetAdjustmentBehavior = .never
         contentInset = .init(top: 0, left: 0, bottom: 0, right: 0)
@@ -66,7 +66,18 @@ extension TasksListTableView: TasksListTableViewInput {
 extension TasksListTableView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         deselectRow(at: indexPath, animated: true)
-        output?.taskDidTapped(withIndex: indexPath.row)
+
+        guard let contentModel = output?.findedModels else { return }
+
+        switch contentModel {
+        case .loading:
+            return
+        case .loaded(let models):
+            guard models.count > indexPath.row else { return }
+            output?.taskDidTapped(models[indexPath.row])
+        case .failed:
+            return
+        }
     }
 }
 
@@ -78,17 +89,33 @@ extension TasksListTableView: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let contentModel = output?.findedModels else { return 0 }
+        guard let contentModel =  output?.findedModels else { return 0 }
 
-        return contentModel.count
+        switch contentModel {
+        case .loading:
+            return 10
+        case .loaded(let models):
+            return models.count
+        case .failed:
+            return 0
+        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let contentModel = output?.findedModels else { return UITableViewCell() }
 
-        let cell: TasksListTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        cell.configure(with: contentModel[indexPath.row])
-        return cell
+        switch contentModel {
+        case .loading:
+            let shimmerCell: TasksListShimmerTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+            return shimmerCell
+        case .loaded(let models):
+            let cell: TasksListTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+            cell.configure(with: models[indexPath.row])
+            cell.cellDelegate = self
+            return cell
+        case .failed:
+            return UITableViewCell()
+        }
     }
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -97,6 +124,20 @@ extension TasksListTableView: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         0.0
+    }
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+
+        guard let contentModel = output?.findedModels else { return 0.0 }
+
+        switch contentModel {
+        case .loading:
+            return 106.0
+        case .loaded:
+            return UITableView.automaticDimension
+        case .failed:
+            return 0.0
+        }
     }
 
     func tableView(
@@ -110,7 +151,14 @@ extension TasksListTableView: UITableViewDataSource {
             previewProvider: { [weak self] () -> UIViewController? in
                 guard let contentModel = self?.output?.findedModels else { return nil }
 
-                return TasksListCellPreview(model: contentModel[indexPath.row])
+                switch contentModel {
+                case .loading:
+                    return nil
+                case .loaded(let models):
+                    return TasksListCellPreview(model: models[indexPath.row])
+                case .failed:
+                    return nil
+                }
             }
         ) { [weak self] _ in
 
@@ -118,14 +166,34 @@ extension TasksListTableView: UITableViewDataSource {
                 title: Strings.edit,
                 image: .designPalette.edit.withTintColor(.designPalette.white)
             ) { _ in
-                self?.output?.taskDidTapped(withIndex: indexPath.row)
+                guard let contentModel = self?.output?.findedModels else { return }
+
+                switch contentModel {
+                case .loading:
+                    return
+                case .loaded(let models):
+                    guard models.count > indexPath.row else { return }
+                    self?.output?.taskDidTapped(models[indexPath.row])
+                case .failed:
+                    return
+                }
             }
 
             let shareAction = UIAction(
                 title: Strings.share,
                 image: .designPalette.share.withTintColor(.designPalette.white)
             ) { _ in
+                guard let contentModel = self?.output?.findedModels else { return }
 
+                switch contentModel {
+                case .loading:
+                    return
+                case .loaded(let models):
+                    guard models.count > indexPath.row else { return }
+                    self?.output?.shareTask(models[indexPath.row])
+                case .failed:
+                    return
+                }
             }
 
             let deleteAction = UIAction(
@@ -134,6 +202,17 @@ extension TasksListTableView: UITableViewDataSource {
                 attributes: .destructive
             ) { _ in
 
+                guard let contentModel = self?.output?.findedModels else { return }
+
+                switch contentModel {
+                case .loading:
+                    return
+                case .loaded(let models):
+                    guard models.count > indexPath.row else { return }
+                    self?.output?.deleteTaskDidTapped(with: models[indexPath.row])
+                case .failed:
+                    return
+                }
             }
 
             let menu = UIMenu(
@@ -147,5 +226,13 @@ extension TasksListTableView: UITableViewDataSource {
         }
 
         return config
+    }
+}
+
+// MARK: - TasksListTableViewCellDelegate
+
+extension TasksListTableView: TasksListTableViewCellDelegate {
+    func didTapTaskDone(withId id: String, state: Bool, completion: @escaping (Bool) -> Void) {
+        output?.taskDoneDidTapped(withId: id, state: state, completion: completion)
     }
 }

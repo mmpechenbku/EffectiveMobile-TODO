@@ -34,7 +34,7 @@ extension DesignPalette {
     struct UIImages {
         static let shared = UIImages()
 
-        let checkmark: UIImage = UIImage(named: "checkmark") ?? UIImage()
+        let checkmark: UIImage = UIImage(named: "circleCheckmark") ?? UIImage()
         let circle: UIImage = UIImage(named: "circle") ?? UIImage()
         let leftDirectionArrowIcon: UIImage = UIImage(named: "leftDirectionArrowIcon") ?? UIImage()
         let mic: UIImage = UIImage(named: "mic") ?? UIImage()

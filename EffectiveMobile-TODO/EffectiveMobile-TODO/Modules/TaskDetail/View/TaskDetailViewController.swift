@@ -34,6 +34,7 @@ final class TaskDetailViewController: ParentViewController {
         textView.sizeToFit()
         textView.textContainer.lineFragmentPadding = 0
         textView.delegate = self
+        textView.inputAccessoryView = toolBar
         return textView
     }()
 
@@ -67,6 +68,7 @@ final class TaskDetailViewController: ParentViewController {
         textView.sizeToFit()
         textView.textContainer.lineFragmentPadding = 0
         textView.delegate = self
+        textView.inputAccessoryView = toolBar
         return textView
     }()
 
@@ -78,6 +80,22 @@ final class TaskDetailViewController: ParentViewController {
         placeholderLabel.isUserInteractionEnabled = false
         placeholderLabel.sizeToFit()
         return placeholderLabel
+    }()
+
+    private lazy var toolBar: UIToolbar = {
+        let toolbar = UIToolbar(frame: .init(origin: .zero, size: CGSize(width: UIScreen.main.bounds.width, height: 35)))
+        toolbar.barStyle = .default
+        toolbar.isTranslucent = false
+        toolbar.tintColor = .designPalette.yellow
+        toolbar.sizeToFit()
+
+        let spaceArea = UIBarButtonItem(systemItem: .flexibleSpace)
+        let doneButton = UIBarButtonItem(title: Strings.save, style: .done, target: self, action: #selector(saveButtonDidTapped))
+
+        toolbar.setItems([spaceArea, doneButton], animated: false)
+        toolbar.isUserInteractionEnabled = true
+
+        return toolbar
     }()
 
     private let output: TaskDetailViewOutput
@@ -197,15 +215,24 @@ private extension TaskDetailViewController {
             descriptionPlaceholderLabel.isHidden = true
         }
     }
+
+    @objc
+    func saveButtonDidTapped() {
+        output.saveTask()
+    }
 }
 
 extension TaskDetailViewController: TaskDetailViewInput {
-    func configure(with model: Task) {
-        titleTextView.text = model.title
-        dateLabel.text = model.dateString
-        descriptionTextView.text = model.description
+    func configure(with model: Task?) {
+        titleTextView.text = model?.title ?? ""
+        dateLabel.text = model?.date.taskDateString() ?? Date().taskDateString()
+        descriptionTextView.text = model?.description ?? ""
 
         showPlaceholdersIfNeeded()
+    }
+
+    func showError(with text: String) {
+        self.showFlashAlert(with: text)
     }
 }
 
@@ -214,10 +241,7 @@ extension TaskDetailViewController: TaskDetailViewInput {
 extension TaskDetailViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         showPlaceholdersIfNeeded()
-    }
-
-    func textViewDidEndEditing(_ textView: UITextView) {
-        textView.resignFirstResponder()
-        showPlaceholdersIfNeeded()
+        output.taskTitle = titleTextView.text
+        output.taskDescription = descriptionTextView.text
     }
 }

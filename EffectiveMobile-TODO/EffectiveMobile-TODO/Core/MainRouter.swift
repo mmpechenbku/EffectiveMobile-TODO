@@ -8,6 +8,7 @@
 import UIKit
 
 final class MainRouter: NSObject {
+    
     private let window: UIWindow
     private var navigationController: UINavigationController?
 

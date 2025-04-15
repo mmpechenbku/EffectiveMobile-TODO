@@ -42,7 +42,11 @@ final class TasksListViewController: ParentViewController {
         super.viewDidLoad()
         setupUI()
         setupDelegates()
-        output.didLoadView()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        output.didAppear()
     }
 }
 
@@ -85,7 +89,7 @@ private extension TasksListViewController {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             $0.leading.equalToSuperview().inset(20.0)
             $0.trailing.equalToSuperview().inset(20.0)
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalTo(footerView.snp.top)
         }
 
         footerView.snp.makeConstraints {
@@ -95,27 +99,7 @@ private extension TasksListViewController {
     }
 
     func setupNavBar() {
-        let navBarAppearance = UINavigationBarAppearance()
 
-        navBarAppearance.configureWithOpaqueBackground()
-        navBarAppearance.backgroundColor = .designPalette.black
-        navBarAppearance.titleTextAttributes = [
-            .foregroundColor: UIColor.designPalette.white,
-            .font: UIFont.systemFont(ofSize: 17.0, weight: .bold)
-        ]
-
-        navBarAppearance.largeTitleTextAttributes = [
-            .foregroundColor: UIColor.designPalette.white,
-            .font: UIFont.systemFont(ofSize: 34.0, weight: .bold)
-        ]
-
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.scrollEdgeAppearance = navBarAppearance
-        navigationController?.navigationBar.compactAppearance = navBarAppearance
-        navigationController?.navigationBar.standardAppearance = navBarAppearance
-        navigationController?.navigationBar.compactScrollEdgeAppearance = navBarAppearance
-
-        navigationController?.navigationBar.backgroundColor = .designPalette.black
 
         navigationItem.title = Strings.tasks
         navigationItem.largeTitleDisplayMode = .always
@@ -128,8 +112,10 @@ private extension TasksListViewController {
         searchController.searchBar.searchTextField.textColor = .designPalette.white
         searchController.searchBar.searchTextField.backgroundColor = .designPalette.gray
 
-        let liveTextImage = UIImage.designPalette.mic.withTintColor(.designPalette.white)
-        searchController.searchBar.setImage(liveTextImage, for: .bookmark, state: [])
+        let liveTextImageNormal = UIImage.designPalette.mic.withTintColor(.designPalette.white)
+        let liveTextImageFocused = UIImage.designPalette.mic.withTintColor(.designPalette.yellow)
+        searchController.searchBar.setImage(liveTextImageNormal, for: .bookmark, state: [.normal])
+        searchController.searchBar.setImage(liveTextImageFocused, for: .bookmark, state: [.focused])
         searchController.searchBar.showsBookmarkButton = true
 
         searchController.searchBar.searchTextField.attributedPlaceholder = NSAttributedString(
@@ -144,7 +130,6 @@ private extension TasksListViewController {
             leftView.tintColor = UIColor.designPalette.white.withAlphaComponent(0.5)
         }
     }
-
 }
 
 // MARK: - UISearchBarDelegate
@@ -152,6 +137,10 @@ private extension TasksListViewController {
 extension TasksListViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         output.findTasks(with: searchText)
+    }
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        output.findTasks(with: "")
     }
 }
 
@@ -167,6 +156,23 @@ extension TasksListViewController: TasksListFooterViewDelegate {
 
 extension TasksListViewController: TasksListViewInput {
     func setupFooter(with text: String) {
-        footerView.configure(with: text)
+        DispatchQueue.main.async { [weak self] in
+            self?.footerView.configure(with: text)
+        }
+    }
+
+    func showDeleteTask(withMessage message: String, title: String, deleteAction: @escaping (() -> Void)) {
+        self.deleteAlertController(with: message, title: title, deleteAction: deleteAction)
+    }
+
+    func showShareTask(title: String, description: String, dateString: String) {
+        let shareString = "\(title):\n\(description)\n\(Strings.date): \(dateString)"
+        let shareController = UIActivityViewController(activityItems: [shareString], applicationActivities: nil)
+        shareController.popoverPresentationController?.sourceView = self.view
+        self.present(shareController, animated: true)
+    }
+
+    func showError(withText text: String) {
+        self.showFlashAlert(with: text)
     }
 }
