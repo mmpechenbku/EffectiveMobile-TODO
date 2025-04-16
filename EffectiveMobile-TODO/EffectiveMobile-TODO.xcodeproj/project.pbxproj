@@ -10,8 +10,19 @@
 		E4D122E02DAAEDC500AE54B1 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E4D122DF2DAAEDC500AE54B1 /* SnapKit */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		E4D1266C2DAF165F00AE54B1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4D122172DAADF1B00AE54B1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E4D1221E2DAADF1B00AE54B1;
+			remoteInfo = "EffectiveMobile-TODO";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		E4D1221F2DAADF1B00AE54B1 /* EffectiveMobile-TODO.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "EffectiveMobile-TODO.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4D126682DAF165F00AE54B1 /* EffectiveMobile-TODOTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "EffectiveMobile-TODOTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -33,6 +44,11 @@
 			path = "EffectiveMobile-TODO";
 			sourceTree = "<group>";
 		};
+		E4D126692DAF165F00AE54B1 /* EffectiveMobile-TODOTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "EffectiveMobile-TODOTests";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +60,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E4D126652DAF165F00AE54B1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -51,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				E4D122212DAADF1B00AE54B1 /* EffectiveMobile-TODO */,
+				E4D126692DAF165F00AE54B1 /* EffectiveMobile-TODOTests */,
 				E4D122202DAADF1B00AE54B1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -59,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				E4D1221F2DAADF1B00AE54B1 /* EffectiveMobile-TODO.app */,
+				E4D126682DAF165F00AE54B1 /* EffectiveMobile-TODOTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,6 +114,29 @@
 			productReference = E4D1221F2DAADF1B00AE54B1 /* EffectiveMobile-TODO.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E4D126672DAF165F00AE54B1 /* EffectiveMobile-TODOTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E4D1266E2DAF165F00AE54B1 /* Build configuration list for PBXNativeTarget "EffectiveMobile-TODOTests" */;
+			buildPhases = (
+				E4D126642DAF165F00AE54B1 /* Sources */,
+				E4D126652DAF165F00AE54B1 /* Frameworks */,
+				E4D126662DAF165F00AE54B1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E4D1266D2DAF165F00AE54B1 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E4D126692DAF165F00AE54B1 /* EffectiveMobile-TODOTests */,
+			);
+			name = "EffectiveMobile-TODOTests";
+			packageProductDependencies = (
+			);
+			productName = "EffectiveMobile-TODOTests";
+			productReference = E4D126682DAF165F00AE54B1 /* EffectiveMobile-TODOTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -101,6 +149,10 @@
 				TargetAttributes = {
 					E4D1221E2DAADF1B00AE54B1 = {
 						CreatedOnToolsVersion = 16.1;
+					};
+					E4D126672DAF165F00AE54B1 = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = E4D1221E2DAADF1B00AE54B1;
 					};
 				};
 			};
@@ -122,12 +174,20 @@
 			projectRoot = "";
 			targets = (
 				E4D1221E2DAADF1B00AE54B1 /* EffectiveMobile-TODO */,
+				E4D126672DAF165F00AE54B1 /* EffectiveMobile-TODOTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E4D1221D2DAADF1B00AE54B1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E4D126662DAF165F00AE54B1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -144,7 +204,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E4D126642DAF165F00AE54B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E4D1266D2DAF165F00AE54B1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E4D1221E2DAADF1B00AE54B1 /* EffectiveMobile-TODO */;
+			targetProxy = E4D1266C2DAF165F00AE54B1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E4D122332DAADF1D00AE54B1 /* Debug */ = {
@@ -326,6 +401,40 @@
 			};
 			name = Release;
 		};
+		E4D1266F2DAF165F00AE54B1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mmpechenbku.projects.EffectiveMobile-TODOTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EffectiveMobile-TODO.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EffectiveMobile-TODO";
+			};
+			name = Debug;
+		};
+		E4D126702DAF165F00AE54B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mmpechenbku.projects.EffectiveMobile-TODOTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EffectiveMobile-TODO.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EffectiveMobile-TODO";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -343,6 +452,15 @@
 			buildConfigurations = (
 				E4D122332DAADF1D00AE54B1 /* Debug */,
 				E4D122342DAADF1D00AE54B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E4D1266E2DAF165F00AE54B1 /* Build configuration list for PBXNativeTarget "EffectiveMobile-TODOTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E4D1266F2DAF165F00AE54B1 /* Debug */,
+				E4D126702DAF165F00AE54B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

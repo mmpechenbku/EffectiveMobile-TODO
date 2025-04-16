@@ -110,8 +110,10 @@ extension TasksListTableView: UITableViewDataSource {
             return shimmerCell
         case .loaded(let models):
             let cell: TasksListTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-            cell.configure(with: models[indexPath.row])
-            cell.cellDelegate = self
+            if models.count > indexPath.row {
+                cell.configure(with: models[indexPath.row])
+                cell.cellDelegate = self
+            }
             return cell
         case .failed:
             return UITableViewCell()

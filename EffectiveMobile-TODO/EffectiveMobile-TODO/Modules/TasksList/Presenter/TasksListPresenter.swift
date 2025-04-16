@@ -53,8 +53,6 @@ final class TasksListPresenter {
     weak var tableView: TasksListTableViewInput?
     let router: TasksListRouterProtocol
     let interactor: TasksListInteractorProtocol
-    let userProfileManager: UserProfileManager
-    let isApiDataAlreadyLoaded: Bool
 
     // MARK: - Private Properties
 
@@ -77,15 +75,12 @@ final class TasksListPresenter {
         view: TasksListViewInput? = nil,
         tableView: TasksListTableViewInput? = nil,
         router: TasksListRouterProtocol,
-        interactor: TasksListInteractorProtocol,
-        userProfileManager: UserProfileManager
+        interactor: TasksListInteractorProtocol
     ) {
         self.view = view
         self.tableView = tableView
         self.router = router
         self.interactor = interactor
-        self.userProfileManager = userProfileManager
-        self.isApiDataAlreadyLoaded = userProfileManager.isApiDataAlreadyLoaded()
     }
 }
 
@@ -94,7 +89,7 @@ final class TasksListPresenter {
 private extension TasksListPresenter {
     func setupContentModel(completion: @escaping () -> Void) {
         findedModels = .loading
-        if isApiDataAlreadyLoaded {
+        if interactor.getApiDataAlreadyLoadedState() {
             loadDataFromDatabase(completion: completion)
         } else {
             loadAndSaveDataFromAPI(completion: completion)
@@ -157,20 +152,18 @@ private extension TasksListPresenter {
     }
 
     func loadDataFromDatabase(completion: @escaping () -> Void) {
-        if isApiDataAlreadyLoaded {
-            interactor.obtainTasksFromDataBase { [weak self] result in
-                guard let self else { return }
-                switch result {
-                case .success(let tasks):
-                    contentModel = tasks
-                case .failure(let error):
-                    findedModels = .failed
-                    DispatchQueue.main.async { [weak self] in
-                        self?.view?.showError(withText: error.localizedDescription)
-                    }
+        interactor.obtainTasksFromDataBase { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let tasks):
+                contentModel = tasks
+            case .failure(let error):
+                findedModels = .failed
+                DispatchQueue.main.async { [weak self] in
+                    self?.view?.showError(withText: error.localizedDescription)
                 }
-                completion()
             }
+            completion()
         }
     }
 
@@ -185,7 +178,7 @@ private extension TasksListPresenter {
                     switch result {
                     case .success(let isSaved):
                         if isSaved {
-                            userProfileManager.setApiDataLoadingState(isLoaded: isSaved)
+                            interactor.setApiDataLoadingState(with: isSaved)
                         }
                     case .failure(let error):
                         findedModels = .failed

@@ -27,11 +27,16 @@ final class NetworkManager: NetworkManagerProtocol {
 
     static let shared = NetworkManager()
 
+    // MARK: - Private Properties
+
+    private let session: URLSessionProtocol
     private let baseAPIURL = "https://dummyjson.com/todos"
 
     // MARK: - Init
 
-    private init() {}
+    init(session: URLSessionProtocol = URLSession.shared) {
+        self.session = session
+    }
 
     // MARK: - Internal Methods
 
@@ -40,7 +45,7 @@ final class NetworkManager: NetworkManagerProtocol {
             with: URL(string: baseAPIURL),
             type: .GET
         ) { request in
-            let task = URLSession.shared.dataTask(with: request) { data, _, error in
+            let task = self.session.dataTask(with: request) { data, _, error in
                 guard let data, error == nil else {
                     completion(.failure(APIError.failedToGetData))
                     return

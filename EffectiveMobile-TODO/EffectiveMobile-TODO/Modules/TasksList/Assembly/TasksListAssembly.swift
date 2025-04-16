@@ -12,8 +12,12 @@ final class TasksListAssembly {
         let userProfileManager = UserProfileManager()
 
         let router = TasksListRouter()
-        let interactor = TasksListInteracotr(networkManager: networkManager, databaseManager: databaseManager)
-        let presenter = TasksListPresenter(router: router, interactor: interactor, userProfileManager: userProfileManager)
+        let interactor = TasksListInteracotr(
+            networkManager: networkManager,
+            databaseManager: databaseManager,
+            userProfileManager: userProfileManager
+        )
+        let presenter = TasksListPresenter(router: router, interactor: interactor)
 
         let tableView = TasksListTableView(output: presenter)
         let view = TasksListViewController(output: presenter, tableView: tableView)

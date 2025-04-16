@@ -23,16 +23,20 @@ final class CoreDataManager {
     // MARK: - Internal Properties
 
     static let shared = CoreDataManager()
+    var container: NSPersistentContainer
 
     // MARK: - Private Properties
 
-    private var container: NSPersistentContainer
     private var context: NSManagedObjectContext { self.container.viewContext }
 
     // MARK: - Init
 
     private init() {
         self.container = Self.makePersistentContainer()
+    }
+
+    init(container: NSPersistentContainer) {
+        self.container = container
     }
 }
 
